@@ -13,8 +13,9 @@ include("newfunc.php");
 if(isset($_POST['app_search_submit']))
 {
 	$contact=$_POST['app_contact'];
-	$query = "select * from appointmenttb where contact= '$contact';";
-  $result = mysqli_query($con,$query);
+	$stmt = mysqli_prepare($con, "SELECT * FROM appointmenttb WHERE contact = ?");
+mysqli_stmt_bind_param($stmt, "s", $contact);
+$result = mysqli_stmt_execute($stmt);
   $row=mysqli_fetch_array($result);
   if($row['fname']=="" & $row['lname']=="" & $row['email']=="" & $row['contact']=="" & $row['doctor']=="" & $row['docFees']=="" & $row['appdate']=="" & $row['apptime']==""){
     echo "<script> alert('No entries found! Please enter valid details'); 
