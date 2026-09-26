@@ -7,8 +7,20 @@ if(isset($_POST['btnSubmit']))
 	$contact = $_POST['txtPhone'];
 	$message = $_POST['txtMsg'];
 
-	$query="insert into contact(name,email,contact,message) values('$name','$email','$contact','$message');";
-	$result = mysqli_query($con,$query);
+	$stmt = mysqli_prepare($con, 
+    "INSERT INTO contact (name, email, contact, message) VALUES (?, ?, ?, ?)"
+);
+
+mysqli_stmt_bind_param(
+    $stmt,
+    "ssss",
+    $name,
+    $email,
+    $contact,
+    $message
+);
+
+$result = mysqli_stmt_execute($stmt);
 	
 	if($result)
     {
