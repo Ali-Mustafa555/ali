@@ -39,8 +39,9 @@ if(isset($_POST['docsub']))
 if(isset($_POST['docsub1']))
 {
   $demail=$_POST['demail'];
-  $query="delete from doctb where email='$demail';";
-  $result=mysqli_query($con,$query);
+  $stmt = mysqli_prepare($con, "DELETE FROM doctb WHERE email = ?");
+mysqli_stmt_bind_param($stmt, "s", $demail);
+$result = mysqli_stmt_execute($stmt);
   if($result)
     {
       echo "<script>alert('Doctor removed successfully!');</script>";
