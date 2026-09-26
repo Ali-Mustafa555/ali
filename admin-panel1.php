@@ -6,17 +6,33 @@ include('newfunc.php');
 
 if(isset($_POST['docsub']))
 {
-  $doctor=$_POST['doctor'];
-  $dpassword=$_POST['dpassword'];
-  $demail=$_POST['demail'];
-  $spec=$_POST['special'];
-  $docFees=$_POST['docFees'];
-  $query="insert into doctb(username,password,email,spec,docFees)values('$doctor','$dpassword','$demail','$spec','$docFees')";
-  $result=mysqli_query($con,$query);
-  if($result)
+    $doctor = $_POST['doctor'];
+    $dpassword = $_POST['dpassword'];
+    $demail = $_POST['demail'];
+    $spec = $_POST['special'];
+    $docFees = $_POST['docFees'];
+
+    $stmt = mysqli_prepare($con, 
+        "INSERT INTO doctb (username, password, email, spec, docFees)
+         VALUES (?, ?, ?, ?, ?)"
+    );
+
+    mysqli_stmt_bind_param(
+        $stmt,
+        "ssssd",
+        $doctor,
+        $dpassword,
+        $demail,
+        $spec,
+        $docFees
+    );
+
+    $result = mysqli_stmt_execute($stmt);
+
+    if($result)
     {
-      echo "<script>alert('Doctor added successfully!');</script>";
-  }
+        echo "<script>alert('Doctor added successfully!');</script>";
+    }
 }
 
 
