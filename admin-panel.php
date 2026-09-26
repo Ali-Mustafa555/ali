@@ -79,31 +79,50 @@ if(isset($_GET['cancel']))
         echo "<script>alert('Your appointment successfully cancelled');</script>"; 
     } 
 }
-function generate_bill(){
-  $con=mysqli_connect("localhost","root","","myhmsdb");
-  $pid = $_SESSION['pid'];
-  $output='';
-  $query=mysqli_query($con,"select p.pid,p.ID,p.fname,p.lname,p.doctor,p.appdate,p.apptime,p.disease,p.allergy,p.prescription,a.docFees from prestb p inner join appointmenttb a on p.ID=a.ID and p.pid = '$pid' and p.ID = '".$_GET['ID']."'");
-  while($row = mysqli_fetch_array($query)){
-    $output .= '
-    <label> Patient ID : </label>'.$row["pid"].'<br/><br/>
-    <label> Appointment ID : </label>'.$row["ID"].'<br/><br/>
-    <label> Patient Name : </label>'.$row["fname"].' '.$row["lname"].'<br/><br/>
-    <label> Doctor Name : </label>'.$row["doctor"].'<br/><br/>
-    <label> Appointment Date : </label>'.$row["appdate"].'<br/><br/>
-    <label> Appointment Time : </label>'.$row["apptime"].'<br/><br/>
-    <label> Disease : </label>'.$row["disease"].'<br/><br/>
-    <label> Allergies : </label>'.$row["allergy"].'<br/><br/>
-    <label> Prescription : </label>'.$row["prescription"].'<br/><br/>
-    <label> Fees Paid : </label>'.$row["docFees"].'<br/>
-    
-    ';
+function generate_bill(){ 
+  $con = mysqli_connect("localhost", "root", "root", "myhmsdb"); 
+  $pid = $_SESSION['pid']; 
+  $output = '';
 
+  $id = filter_input(INPUT_GET, 'ID', FILTER_VALIDATE_INT);
+
+  if ($id === false || $id === null) {
+    return;
   }
+
+  $stmt = mysqli_prepare($con, "
+    SELECT p.pid, p.ID, p.fname, p.lname, p.doctor, p.appdate,
+           p.apptime, p.disease, p.allergy, p.prescription, a.docFees
+    FROM prestb p
+    INNER JOIN appointmenttb a
+      ON p.ID = a.ID
+      AND p.pid = ?
+      AND p.ID = ?
+  ");
+
+  mysqli_stmt_bind_param($stmt, "si", $pid, $id);
+  mysqli_stmt_execute($stmt);
+
+  $query = mysqli_stmt_get_result($stmt);
+
+  while($row = mysqli_fetch_array($query)){ 
+    $output .= ' 
+    <label> Patient ID : </label>'.$row["pid"].'<br/><br/> 
+    <label> Appointment ID : </label>'.$row["ID"].'<br/><br/> 
+    <label> Patient Name : </label>'.$row["fname"].' '.$row["lname"].'<br/><br/> 
+    <label> Doctor Name : </label>'.$row["doctor"].'<br/><br/> 
+    <label> Appointment Date : </label>'.$row["appdate"].'<br/><br/> 
+    <label> Appointment Time : </label>'.$row["apptime"].'<br/><br/> 
+    <label> Disease : </label>'.$row["disease"].'<br/><br/> 
+    <label> Allergies : </label>'.$row["allergy"].'<br/><br/> 
+    <label> Prescription : </label>'.$row["prescription"].'<br/><br/> 
+    <label> Fees Paid : </label>'.$row["docFees"].'<br/> 
+    ';
+  
   
   return $output;
 }
-
+}
 
 if(isset($_GET["generate_bill"])){
   require_once("TCPDF/tcpdf.php");
