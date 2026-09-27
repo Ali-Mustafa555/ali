@@ -4,8 +4,15 @@ $con=mysqli_connect("localhost","root","","myhmsdb");
 if(isset($_POST['search_submit'])){
   $contact=$_POST['contact'];
   $docname = $_SESSION['dname'];
- $query="select * from appointmenttb where contact='$contact' and doctor='$docname';";
- $result=mysqli_query($con,$query);
+$stmt = mysqli_prepare(
+    $con,
+    "SELECT * FROM appointmenttb WHERE contact = ? AND doctor = ?"
+);
+
+mysqli_stmt_bind_param($stmt, "ss", $contact, $docname);
+mysqli_stmt_execute($stmt);
+
+$result = mysqli_stmt_get_result($stmt);
  echo '<!DOCTYPE html>
 <html lang="en">
   <head>
