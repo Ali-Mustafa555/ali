@@ -87,8 +87,13 @@ $result = true;
 if(isset($_POST['doc_sub']))
 {
 	$name=$_POST['name'];
-	$query="insert into doctb(name)values('$name')";
-	$result=mysqli_query($con,$query);
+	$stmt = mysqli_prepare(
+    $con,
+    "INSERT INTO doctb (name) VALUES (?)"
+);
+
+mysqli_stmt_bind_param($stmt, "s", $name);
+$result = mysqli_stmt_execute($stmt);
 	if($result)
 		header("Location:adddoc.php");
 }
