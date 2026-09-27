@@ -1982,8 +1982,8 @@ public static function _AESnopad($key, $text) {
 				}
 				curl_setopt($crs, CURLOPT_CONNECTTIMEOUT, 5);
 				curl_setopt($crs, CURLOPT_TIMEOUT, 30);
-				curl_setopt($crs, CURLOPT_SSL_VERIFYPEER, false);
-				curl_setopt($crs, CURLOPT_SSL_VERIFYHOST, false);
+				curl_setopt($crs, CURLOPT_SSL_VERIFYPEER, true);
+                      curl_setopt($crs, CURLOPT_SSL_VERIFYHOST, 2);
 				curl_setopt($crs, CURLOPT_USERAGENT, 'tc-lib-file');
 				$ret = curl_exec($crs);
 				curl_close($crs);
