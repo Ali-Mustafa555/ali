@@ -36,8 +36,15 @@ if(isset($_POST['update_data']))
 {
 	$contact=$_POST['contact'];
 	$status=$_POST['status'];
-	$query="update appointmenttb set payment='$status' where contact='$contact';";
-	$result=mysqli_query($con,$query);
+	$stmt = mysqli_prepare(
+    $con,
+    "UPDATE appointmenttb SET payment = ? WHERE contact = ?"
+);
+
+mysqli_stmt_bind_param($stmt, "ss", $status, $contact);
+mysqli_stmt_execute($stmt);
+
+$result = true;
 	if($result)
 		header("Location:updated.php");
 }
