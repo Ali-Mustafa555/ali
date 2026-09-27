@@ -441,20 +441,26 @@ class TCPDF_STATIC {
 	 * @since 5.0.005 (2010-05-11)
 	 * @public static
 	 */
-	public static function _AES($key, $text) {
-		// padding (RFC 2898, PKCS #5: Password-Based Cryptography Specification Version 2.0)
-		$padding = 16 - (strlen($text) % 16);
-		$text .= str_repeat(chr($padding), $padding);
-		if (extension_loaded('openssl')) {
-			$iv = openssl_random_pseudo_bytes (openssl_cipher_iv_length('aes-256-cbc'));
-			$text = openssl_encrypt($text, 'aes-256-cbc', $key, OPENSSL_RAW_DATA, $iv);
-			return $iv.substr($text, 0, -16);
-		}
-		$iv = mcrypt_create_iv(mcrypt_get_iv_size(MCRYPT_RIJNDAEL_128, MCRYPT_MODE_CBC), MCRYPT_RAND);
-		$text = mcrypt_encrypt(MCRYPT_RIJNDAEL_128, $key, $text, MCRYPT_MODE_CBC, $iv);
-		$text = $iv.$text;
-		return $text;
-	}
+public static function _AES($key, $text) {
+    // padding (RFC 2898, PKCS #5: Password-Based Cryptography Specification Version 2.0)
+    $padding = 16 - (strlen($text) % 16);
+    $text .= str_repeat(chr($padding), $padding);
+
+    if (!extension_loaded('openssl')) {
+        throw new RuntimeException('OpenSSL extension is required for AES encryption.');
+    }
+
+    $iv = random_bytes(openssl_cipher_iv_length('aes-256-cbc'));
+    $text = openssl_encrypt(
+        $text,
+        'aes-256-cbc',
+        $key,
+        OPENSSL_RAW_DATA,
+        $iv
+    );
+
+    return $iv . substr($text, 0, -16);
+}
 
 	/**
 	 * Returns the input text exrypted using AES algorithm and the specified key.
