@@ -472,16 +472,22 @@ public static function _AES($key, $text) {
 	 * @since TODO
 	 * @public static
 	 */
-	public static function _AESnopad($key, $text) {
-		if (extension_loaded('openssl')) {
-			$iv = str_repeat("\x00", openssl_cipher_iv_length('aes-256-cbc'));
-			$text = openssl_encrypt($text, 'aes-256-cbc', $key, OPENSSL_RAW_DATA, $iv);
-			return substr($text, 0, -16);
-		}
-		$iv = str_repeat("\x00", mcrypt_get_iv_size(MCRYPT_RIJNDAEL_128, MCRYPT_MODE_CBC));
-		$text = mcrypt_encrypt(MCRYPT_RIJNDAEL_128, $key, $text, MCRYPT_MODE_CBC, $iv);
-		return $text;
-	}
+public static function _AESnopad($key, $text) {
+    if (!extension_loaded('openssl')) {
+        throw new RuntimeException('OpenSSL extension is required for AES encryption.');
+    }
+
+    $iv = str_repeat("\x00", openssl_cipher_iv_length('aes-256-cbc'));
+    $text = openssl_encrypt(
+        $text,
+        'aes-256-cbc',
+        $key,
+        OPENSSL_RAW_DATA,
+        $iv
+    );
+
+    return substr($text, 0, -16);
+}
 
 	/**
 	 * Returns the input text encrypted using RC4 algorithm and the specified key.
