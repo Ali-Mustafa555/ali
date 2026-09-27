@@ -71,8 +71,22 @@ if(isset($_POST['doc_sub']))
   $dpassword=$_POST['dpassword'];
   $demail=$_POST['demail'];
   $docFees=$_POST['docFees'];
-	$query="insert into doctb(username,password,email,docFees)values('$doctor','$dpassword','$demail','$docFees')";
-	$result=mysqli_query($con,$query);
+$stmt = mysqli_prepare(
+    $con,
+    "INSERT INTO doctb (username, password, email, docFees)
+     VALUES (?, ?, ?, ?)"
+);
+
+mysqli_stmt_bind_param(
+    $stmt,
+    "sssd",
+    $doctor,
+    $dpassword,
+    $demail,
+    $docFees
+);
+
+$result = mysqli_stmt_execute($stmt);
 	if($result)
 		header("Location:adddoc.php");
 }
